@@ -28,11 +28,7 @@ const App = () => {
         <div style={{ textAlign: "center" }}>
           <Title level={1}>A better way to enjoy everyday.</Title>
           <Paragraph>Be the first to know when we launch.</Paragraph>
-          <Button
-            type="primary"
-            variant="outlined"
-            onClick={() => setIsRequestModalVisible(true)}
-          >
+          <Button type="primary" onClick={() => setIsRequestModalVisible(true)}>
             Request an invite
           </Button>
         </div>

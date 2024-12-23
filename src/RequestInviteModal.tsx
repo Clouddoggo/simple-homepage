@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Form, Input, message, Modal, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
 import axios from "axios";
 
@@ -15,15 +15,16 @@ export const RequestInviteModal = ({
   onSubmitSuccess,
 }: RequestInviteModalProps) => {
   const [form] = useForm();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   const handleSubmit = async (values: { name: string; email: string }) => {
     const { name, email } = values;
 
-    setIsLoading(true); // Set loading to true when the request starts
+    setErrorMessage(undefined);
+    setIsLoading(true);
 
     try {
-      // Make the POST request to the backend
       const response = await axios.post(
         "https://l94wc2001h.execute-api.ap-southeast-2.amazonaws.com/prod/fake-auth",
         { name, email },
@@ -32,23 +33,33 @@ export const RequestInviteModal = ({
       if (response.status === 200) {
         message.success("Request submitted successfully!");
         onSubmitSuccess();
+      } else {
+        throw new Error(response.data.errorMessage);
       }
-    } catch (error: any) {
-      // Handle error (server returns 400 or other errors)
-      const errorMsg = error.response?.data?.message || "Something went wrong";
+    } catch (error) {
+      const errorMsg =
+        (axios.isAxiosError(error)
+          ? error.response?.data?.errorMessage
+          : (error as Error).message) || "Something went wrong";
+      setErrorMessage(errorMsg);
       message.error(errorMsg);
     } finally {
-      setIsLoading(false); // Set loading to false when request is finished
+      setIsLoading(false);
     }
   };
 
   return (
     <Modal
-      title="Request an invite"
+      title={
+        <Typography.Title level={4} style={{ textAlign: "center" }}>
+          Request an invite
+        </Typography.Title>
+      }
       open={visible}
       onCancel={onClose}
       onClose={onClose}
       footer={null}
+      afterClose={() => form.resetFields()}
     >
       <Form
         form={form}
@@ -57,31 +68,36 @@ export const RequestInviteModal = ({
       >
         <Form.Item
           label="Full name"
-          fieldId="name"
+          name="name"
           rules={[
-            { required: true },
-            { min: 3, message: "Full name must have at least 3 characters" },
+            { required: true, message: "Please enter your full name" },
+            {
+              min: 3,
+              message: "Your full name must have at least 3 characters",
+            },
           ]}
         >
-          <Input placeholder="Please enter your full name" />
+          <Input placeholder="John Doe" />
         </Form.Item>
         <Form.Item
           label="Email"
-          fieldId="email"
+          name="email"
           hasFeedback
           rules={[
-            { required: true },
+            { required: true, message: "Please enter your email" },
             { type: "email", message: "Please enter a valid email" },
           ]}
+          validateDebounce={300}
         >
-          <Input placeholder="Please enter your email" />
+          <Input placeholder="johndoe@example.com" />
         </Form.Item>
         <Form.Item
           label="Confirm Email"
+          name="confirm_email"
           hasFeedback
+          dependencies={["email"]}
           rules={[
-            { required: true },
-            { type: "email", message: "Please enter a valid email" },
+            { required: true, message: "Please confirm your email" },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue("email") === value) {
@@ -93,13 +109,20 @@ export const RequestInviteModal = ({
               },
             }),
           ]}
+          validateDebounce={300}
         >
-          <Input placeholder="Please confirm your email" />
+          <Input placeholder="johndoe@example.com" />
         </Form.Item>
         <Button type="primary" htmlType="submit" block loading={isLoading}>
-          Submit
+          {isLoading ? "Submitting, please wait" : "Submit"}
         </Button>
       </Form>
+      <br />
+      {errorMessage && (
+        <Typography.Text type="danger" style={{ textAlign: "center" }}>
+          {errorMessage}
+        </Typography.Text>
+      )}
     </Modal>
   );
 };
