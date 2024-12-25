@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button, Form, Input, message, Modal, Typography } from "antd";
-import { useForm } from "antd/es/form/Form";
 import axios from "axios";
 
 interface RequestInviteModalProps {
@@ -14,7 +13,7 @@ export const RequestInviteModal = ({
   onClose,
   onSubmitSuccess,
 }: RequestInviteModalProps) => {
-  const [form] = useForm();
+  const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>();
 
@@ -31,7 +30,6 @@ export const RequestInviteModal = ({
       );
 
       if (response.status === 200) {
-        message.success("Request submitted successfully!");
         onSubmitSuccess();
       } else {
         throw new Error(response.data.errorMessage);
@@ -52,7 +50,7 @@ export const RequestInviteModal = ({
     <Modal
       title={
         <Typography.Title level={4} style={{ textAlign: "center" }}>
-          Request an invite
+          Request an invitation
         </Typography.Title>
       }
       open={visible}
@@ -65,9 +63,10 @@ export const RequestInviteModal = ({
         form={form}
         layout="vertical"
         onFinish={(values) => handleSubmit(values)}
+        requiredMark={false}
       >
         <Form.Item
-          label="Full name"
+          label="Full Name"
           name="name"
           rules={[
             { required: true, message: "Please enter your full name" },

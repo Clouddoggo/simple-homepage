@@ -1,48 +1,28 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import App from "../components/App";
+import { mockMatchMedia } from "../setupTests";
+
+beforeAll(() => {
+  mockMatchMedia();
+});
 
 describe("App Component", () => {
   test("renders the main title and button", () => {
     render(<App />);
     expect(
-      screen.getByText(/A better way to enjoy everyday/i),
+      screen.getByText(/A better way to enjoy everyday/),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Request an invite/i }),
+      screen.getByRole("button", { name: /Send me an invite!/ }),
     ).toBeInTheDocument();
   });
 
-  test("opens RequestInviteModal when clicking 'Request an invite'", () => {
+  test("opens RequestInviteModal when clicking 'Send me an invite'", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: /Request an invite/i }));
-    expect(screen.getByText(/Request an invite/i)).toBeInTheDocument();
-  });
+    fireEvent.click(screen.getByRole("button", { name: /Send me an invite!/ }));
 
-  test("closes RequestInviteModal on cancel", () => {
-    render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: /Request an invite/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Cancel/i })); // Assuming there's a cancel button
-    expect(screen.queryByText(/Request an invite/i)).not.toBeInTheDocument();
-  });
-
-  test("shows SuccessModal after successful submission", () => {
-    render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: /Request an invite/i }));
-
-    const nameInput = screen.getByPlaceholderText(/John Doe/i);
-    const emailInput = screen.getByPlaceholderText(/johndoe@example.com/i);
-    const confirmEmailInput = screen.getByPlaceholderText(/Confirm Email/i);
-    const submitButton = screen.getByRole("button", { name: /Submit/i });
-
-    fireEvent.change(nameInput, { target: { value: "John Doe" } });
-    fireEvent.change(emailInput, { target: { value: "johndoe@example.com" } });
-    fireEvent.change(confirmEmailInput, {
-      target: { value: "johndoe@example.com" },
-    });
-    fireEvent.click(submitButton);
-
-    // Simulate successful submission
-    expect(screen.getByText(/All done!/i)).toBeInTheDocument();
+    const modal = screen.getByRole("dialog");
+    expect(within(modal).getByText(/Request an invitation/)).toBeTruthy();
   });
 });

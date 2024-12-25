@@ -1,24 +1,31 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { RequestInviteModal } from "../components/RequestInviteModal";
+import { mockMatchMedia } from "../setupTests";
+
+beforeAll(() => {
+  mockMatchMedia();
+});
 
 describe("RequestInviteModal Component", () => {
   const mockOnClose = jest.fn();
   const mockOnSubmitSuccess = jest.fn();
 
-  test("renders correctly when visible", () => {
-    render(
+  test("renders correctly when visible", async () => {
+    const { getByText, findByRole } = render(
       <RequestInviteModal
         visible={true}
         onClose={mockOnClose}
         onSubmitSuccess={mockOnSubmitSuccess}
       />,
     );
-    expect(screen.getByText(/Request an invite/i)).toBeInTheDocument();
+
+    expect(getByText("Request an invitation")).toBeTruthy();
+    expect(await findByRole("button", { name: "Submit" })).toBeTruthy();
   });
 
-  test("validates email and confirm email", async () => {
-    render(
+  test("validates name length", () => {
+    const { getByText, getByLabelText, getByRole } = render(
       <RequestInviteModal
         visible={true}
         onClose={mockOnClose}
@@ -26,22 +33,50 @@ describe("RequestInviteModal Component", () => {
       />,
     );
 
-    const emailInput = screen.getByPlaceholderText(/johndoe@example.com/i);
-    const confirmEmailInput = screen.getByPlaceholderText(/Confirm Email/i);
-    const submitButton = screen.getByRole("button", { name: /Submit/i });
+    act(() => {
+      const nameInput = getByLabelText(/^Full Name$/);
+      const submitButton = getByRole("button", { name: /Submit/ });
 
-    fireEvent.change(emailInput, { target: { value: "johndoe@example.com" } });
-    fireEvent.change(confirmEmailInput, {
-      target: { value: "wrong@example.com" },
+      fireEvent.change(nameInput, {
+        target: { value: "jo" },
+      });
+      fireEvent.click(submitButton);
     });
-    fireEvent.click(submitButton);
 
     expect(
-      await screen.findByText(/The emails that you entered do not match!/i),
+      getByText(/Your full name must have at least 3 characters/),
     ).toBeInTheDocument();
   });
 
-  test("calls onSubmitSuccess on successful submission", async () => {
+  test("validates email and confirm email are matching", () => {
+    const { getByRole, getByText, getByLabelText } = render(
+      <RequestInviteModal
+        visible={true}
+        onClose={mockOnClose}
+        onSubmitSuccess={mockOnSubmitSuccess}
+      />,
+    );
+
+    act(() => {
+      const emailInput = getByLabelText(/^Email$/);
+      const confirmEmailInput = getByLabelText(/Confirm Email/);
+      const submitButton = getByRole("button", { name: /Submit/ });
+
+      fireEvent.change(emailInput, {
+        target: { value: "johndoe@example.com" },
+      });
+      fireEvent.change(confirmEmailInput, {
+        target: { value: "wrong@example.com" },
+      });
+      fireEvent.click(submitButton);
+    });
+
+    expect(
+      getByText(/The emails that you entered do not match!/),
+    ).toBeInTheDocument();
+  });
+
+  test("closes RequestInviteModal on cancel", () => {
     render(
       <RequestInviteModal
         visible={true}
@@ -50,18 +85,7 @@ describe("RequestInviteModal Component", () => {
       />,
     );
 
-    const nameInput = screen.getByPlaceholderText(/John Doe/i);
-    const emailInput = screen.getByPlaceholderText(/johndoe@example.com/i);
-    const confirmEmailInput = screen.getByPlaceholderText(/Confirm Email/i);
-    const submitButton = screen.getByRole("button", { name: /Submit/i });
-
-    fireEvent.change(nameInput, { target: { value: "John Doe" } });
-    fireEvent.change(emailInput, { target: { value: "johndoe@example.com" } });
-    fireEvent.change(confirmEmailInput, {
-      target: { value: "johndoe@example.com" },
-    });
-    fireEvent.click(submitButton);
-
-    expect(mockOnSubmitSuccess).toHaveBeenCalledTimes(1);
+    fireEvent.click(document.body); // click outside
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 });

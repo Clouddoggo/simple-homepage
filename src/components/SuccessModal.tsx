@@ -13,7 +13,7 @@ export const SuccessModal = ({ visible, onClose }: SuccessModalProps) => {
   return (
     <Modal open={visible} closable={false} footer={null}>
       <Title level={1} style={{ textAlign: "center" }}>
-        All done! <SmileTwoTone />
+        You're invited! <SmileTwoTone />
       </Title>
       <Paragraph>
         You will be one of the first to experience Broccoli & Co. when we

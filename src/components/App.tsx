@@ -29,7 +29,7 @@ const App = () => {
               type="primary"
               onClick={() => setIsRequestModalVisible(true)}
             >
-              Request an invite
+              Send me an invite!
             </Button>
           </Space>
         </Content>

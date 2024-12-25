@@ -6,14 +6,17 @@ describe("SuccessModal Component", () => {
   const mockOnClose = jest.fn();
 
   test("renders correctly when visible", () => {
-    render(<SuccessModal visible={true} onClose={mockOnClose} />);
-    expect(screen.getByText(/All done!/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Great!/i })).toBeInTheDocument();
+    const { getByText, getByRole } = render(
+      <SuccessModal visible={true} onClose={mockOnClose} />,
+    );
+
+    expect(getByText(/You're invited!/)).toBeTruthy();
+    expect(getByRole("button", { name: /Great!/ })).toBeTruthy();
   });
 
   test("calls onClose when 'Great!' button is clicked", () => {
     render(<SuccessModal visible={true} onClose={mockOnClose} />);
-    fireEvent.click(screen.getByRole("button", { name: /Great!/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Great!/ }));
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 });
