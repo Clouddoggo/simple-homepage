@@ -1,0 +1,32 @@
+.page-container {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+
+  .fixed-header {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    left: 0;
+  }
+
+  .fixed-footer {
+    position: fixed;
+    z-index: 1;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    text-align: center;
+  }
+
+  .page-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    text-align: center;
+    padding: 10% 18%;
+  }
+}

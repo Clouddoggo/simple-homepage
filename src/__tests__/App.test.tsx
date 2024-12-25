@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import App from "../App";
+import App from "../components/App";
 
 describe("App Component", () => {
   test("renders the main title and button", () => {

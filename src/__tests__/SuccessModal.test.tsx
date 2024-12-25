@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { SuccessModal } from "../SuccessModal";
+import { SuccessModal } from "../components/SuccessModal";
 
 describe("SuccessModal Component", () => {
   const mockOnClose = jest.fn();

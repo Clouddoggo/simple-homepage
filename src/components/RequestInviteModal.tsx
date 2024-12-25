@@ -77,7 +77,7 @@ export const RequestInviteModal = ({
             },
           ]}
         >
-          <Input placeholder="John Doe" />
+          <Input placeholder="John Doe" allowClear />
         </Form.Item>
         <Form.Item
           label="Email"
@@ -89,7 +89,7 @@ export const RequestInviteModal = ({
           ]}
           validateDebounce={300}
         >
-          <Input placeholder="johndoe@example.com" />
+          <Input placeholder="johndoe@example.com" allowClear />
         </Form.Item>
         <Form.Item
           label="Confirm Email"
@@ -111,7 +111,7 @@ export const RequestInviteModal = ({
           ]}
           validateDebounce={300}
         >
-          <Input placeholder="johndoe@example.com" />
+          <Input placeholder="johndoe@example.com" allowClear />
         </Form.Item>
         <Button type="primary" htmlType="submit" block loading={isLoading}>
           {isLoading ? "Submitting, please wait" : "Submit"}

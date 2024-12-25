@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { RequestInviteModal } from "../RequestInviteModal";
+import { RequestInviteModal } from "../components/RequestInviteModal";
 
 describe("RequestInviteModal Component", () => {
   const mockOnClose = jest.fn();
