@@ -20,6 +20,7 @@ export const RequestInviteModal = ({
   const handleSubmit = async (values: { name: string; email: string }) => {
     const { name, email } = values;
 
+    // Clear previous error message if any
     setErrorMessage(undefined);
     setIsLoading(true);
 

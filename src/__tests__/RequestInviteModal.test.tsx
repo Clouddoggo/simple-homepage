@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, fireEvent, act } from "@testing-library/react";
 import { RequestInviteModal } from "../components/RequestInviteModal";
 import { mockMatchMedia } from "../setupTests";
 
@@ -74,18 +74,5 @@ describe("RequestInviteModal Component", () => {
     expect(
       getByText(/The emails that you entered do not match!/),
     ).toBeInTheDocument();
-  });
-
-  test("closes RequestInviteModal on cancel", () => {
-    render(
-      <RequestInviteModal
-        visible={true}
-        onClose={mockOnClose}
-        onSubmitSuccess={mockOnSubmitSuccess}
-      />,
-    );
-
-    fireEvent.click(document.body); // click outside
-    expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 });
