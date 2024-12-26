@@ -1,5 +1,11 @@
 import React from "react";
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  within,
+  waitFor,
+} from "@testing-library/react";
 import App from "../components/App";
 import { mockMatchMedia } from "../setupTests";
 
@@ -10,19 +16,20 @@ beforeAll(() => {
 describe("App Component", () => {
   test("renders the main title and button", () => {
     render(<App />);
-    expect(
-      screen.getByText(/A better way to enjoy everyday/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/A better way to enjoy everyday/)).toBeVisible();
     expect(
       screen.getByRole("button", { name: /Send me an invite!/ }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
-  test("opens RequestInviteModal when clicking 'Send me an invite'", () => {
+  test("opens RequestInviteModal when clicking 'Send me an invite'", async () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: /Send me an invite!/ }));
 
     const modal = screen.getByRole("dialog");
-    expect(within(modal).getByText(/Request an invitation/)).toBeTruthy();
+
+    await waitFor(() => {
+      expect(within(modal).getByText(/Request an invitation/)).toBeVisible();
+    });
   });
 });

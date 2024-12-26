@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, act } from "@testing-library/react";
+import { render, fireEvent, act, waitFor } from "@testing-library/react";
 import { RequestInviteModal } from "../components/RequestInviteModal";
 import { mockMatchMedia } from "../setupTests";
 
@@ -12,7 +12,7 @@ describe("RequestInviteModal Component", () => {
   const mockOnSubmitSuccess = jest.fn();
 
   test("renders correctly when visible", async () => {
-    const { getByText, findByRole } = render(
+    const { getByText, getByRole } = render(
       <RequestInviteModal
         visible={true}
         onClose={mockOnClose}
@@ -20,12 +20,14 @@ describe("RequestInviteModal Component", () => {
       />,
     );
 
-    expect(getByText("Request an invitation")).toBeTruthy();
-    expect(await findByRole("button", { name: "Submit" })).toBeTruthy();
+    await waitFor(() => {
+      expect(getByText("Request an invitation")).toBeVisible();
+      expect(getByRole("button", { name: "Submit" })).toBeVisible();
+    });
   });
 
-  test("validates name length", () => {
-    const { getByText, getByLabelText, getByRole } = render(
+  test("shows error when name length is less than 3", async () => {
+    const { findByText, getByLabelText, getByRole } = render(
       <RequestInviteModal
         visible={true}
         onClose={mockOnClose}
@@ -33,7 +35,7 @@ describe("RequestInviteModal Component", () => {
       />,
     );
 
-    act(() => {
+    await act(() => {
       const nameInput = getByLabelText(/^Full Name$/);
       const submitButton = getByRole("button", { name: /Submit/ });
 
@@ -44,12 +46,12 @@ describe("RequestInviteModal Component", () => {
     });
 
     expect(
-      getByText(/Your full name must have at least 3 characters/),
+      await findByText(/Your full name must have at least 3 characters/),
     ).toBeInTheDocument();
   });
 
-  test("validates email and confirm email are matching", () => {
-    const { getByRole, getByText, getByLabelText } = render(
+  test("shows error when email is not in email format", async () => {
+    const { getByRole, findByText, getByLabelText } = render(
       <RequestInviteModal
         visible={true}
         onClose={mockOnClose}
@@ -57,7 +59,29 @@ describe("RequestInviteModal Component", () => {
       />,
     );
 
-    act(() => {
+    await act(() => {
+      const emailInput = getByLabelText(/^Email$/);
+      const submitButton = getByRole("button", { name: /Submit/ });
+
+      fireEvent.change(emailInput, {
+        target: { value: "john@com" },
+      });
+      fireEvent.click(submitButton);
+    });
+
+    expect(await findByText(/Please enter a valid email/)).toBeInTheDocument();
+  });
+
+  test("validates email and confirm email are matching", async () => {
+    const { getByRole, findByText, getByLabelText } = render(
+      <RequestInviteModal
+        visible={true}
+        onClose={mockOnClose}
+        onSubmitSuccess={mockOnSubmitSuccess}
+      />,
+    );
+
+    await act(() => {
       const emailInput = getByLabelText(/^Email$/);
       const confirmEmailInput = getByLabelText(/Confirm Email/);
       const submitButton = getByRole("button", { name: /Submit/ });
@@ -72,7 +96,7 @@ describe("RequestInviteModal Component", () => {
     });
 
     expect(
-      getByText(/The emails that you entered do not match!/),
+      await findByText(/The emails that you entered do not match!/),
     ).toBeInTheDocument();
   });
 });
